@@ -13,16 +13,37 @@ func main() {
 		os.Exit(1)
 	}
 
-	command := os.Args[1]
+	i := 1
+	command := os.Args[i]
 	flags := []string{}
 
-	if len(os.Args) > 2 {
-		flags = os.Args[2:]
+	rawTime := false
+	stdOut := true
+
+	for command[0] == '-' {
+		if command == "-r" {
+			rawTime = true
+		} else if command == "-ns" {
+			stdOut = false
+		}
+
+		i += 1
+		command = os.Args[i]
+	}
+
+	if len(os.Args) > 1+i {
+		flags = os.Args[1+i:]
 	}
 
 	cmd := exec.Command(command, flags...)
-	cmd.Stdout = os.Stdout
 	cmd.Stdin = os.Stdin
+
+	if stdOut {
+		cmd.Stdout = os.Stdout
+		cmd.Stderr = os.Stderr
+	}
+
+	cmd.Env = os.Environ()
 
 	start := time.Now()
 	err := cmd.Run()
@@ -34,12 +55,19 @@ func main() {
 
 	ms := duration.Milliseconds()
 
-	fmt.Println()
-	fmt.Println("Execution time:")
-
-	if ms > 0 {
-		fmt.Printf("  %dms\n", ms)
+	if rawTime {
+		fmt.Println(duration.Microseconds())
 	} else {
-		fmt.Printf("  0.%dms (%dns)\n", duration.Microseconds(), duration.Nanoseconds())
+		if stdOut {
+			fmt.Println()
+		}
+
+		fmt.Println("Execution time:")
+
+		if ms > 0 {
+			fmt.Printf("  %dms\n", ms)
+		} else {
+			fmt.Printf("  0.%dms (%dns)\n", duration.Microseconds(), duration.Nanoseconds())
+		}
 	}
 }
