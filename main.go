@@ -7,9 +7,12 @@ import (
 	"time"
 )
 
+const NAME = "gotime"
+const VERSION = "0.1.0"
+
 func main() {
 	if len(os.Args) < 2 {
-		fmt.Println("A command is required")
+		fmt.Printf("Run \"%s -h\" to see how to use this command\n", NAME)
 		os.Exit(1)
 	}
 
@@ -25,6 +28,21 @@ func main() {
 			rawTime = true
 		} else if command == "-ns" {
 			stdOut = false
+		} else if command == "-h" {
+			fmt.Printf("Usage: %s [OPTION]... COMMAND [ARGS]...\n", NAME)
+			fmt.Printf("Examples:\n  %s tar -cavf target.tar.xz directory\n", NAME)
+			fmt.Printf("  cat /var/log/auth.log | %s grep 'pattern'\n", NAME)
+			fmt.Println()
+			fmt.Println("Measure the execution time of a program")
+			fmt.Println()
+			fmt.Println("Available flags")
+			fmt.Println("  -r\tDisplay only the raw microseconds measurement")
+			fmt.Println("  -ns\tPrevent any output from reaching stdout or stderr")
+			fmt.Println("  -v\tShow the version of this program")
+			os.Exit(0)
+		} else if command == "-v" {
+			fmt.Printf("%s %s\n", NAME, VERSION)
+			os.Exit(0)
 		}
 
 		i += 1
